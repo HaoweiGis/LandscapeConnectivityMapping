@@ -43,24 +43,9 @@ def GeoImgW(filename,im_data, im_geotrans, im_porj,bandNames,nodata, driver='GTi
     del dataset
 
 def pixel_geo_register(infile,outfile,reffile,methods):
-    '''
-    infile:输入文件
-    outfile:输出文件
-    reffile:参考文件
-    methods:重采样方法
-            gdalconst.GRA_NearestNeighbour：near
-            gdalconst.GRA_Bilinear:bilinear
-            gdalconst.GRA_Cubic:cubic
-            gdalconst.GRA_CubicSpline:cubicspline
-            gdalconst.GRA_Lanczos:lanczos
-            gdalconst.GRA_Average:average
-            gdalconst.GRA_Mode:mode
-    '''
-    # 打开tif文件
     in_ds  = gdal.Open(infile, gdalconst.GA_ReadOnly) # 输入文件
     ref_ds = gdal.Open(reffile, gdalconst.GA_ReadOnly) # 参考文件
     
-    # 参考文件与输入文件的的地理仿射变换参数与投影信息
     in_trans = in_ds.GetGeoTransform()
     in_proj = in_ds.GetProjection()
     ref_trans = ref_ds.GetGeoTransform()
@@ -82,7 +67,7 @@ def pixel_geo_register(infile,outfile,reffile,methods):
     raster_band = output.GetRasterBand(1)
     raster_band.SetNoDataValue(0)
     
-    # 重投影，插值方法为双线性内插法
+    # 重投影，插值方法为GRA_NearestNeighbour
     gdal.ReprojectImage(in_ds, output, in_proj, ref_proj, methods)
     
     # 关闭数据集与driver
